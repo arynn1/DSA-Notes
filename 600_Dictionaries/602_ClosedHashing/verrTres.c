@@ -2,13 +2,15 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #define MAX 10
-#define EMPTY -1
-#define FULL 1
-#define DELETED 0
+
+typedef enum{
+    EMPTY,
+    FULL
+}Status;
 
 typedef struct{
     int data;
-    int status;
+    Status status;
     int link;
 }nodeType;
 
@@ -110,26 +112,33 @@ void initDict(Dictionary* D){
 
     D->avail = MAX;
 
-    for(int i = MAX; i < MAX*2; i++){
+    int i;
+    for(i = MAX; i < (MAX*2 - 1); i++){                                                                                                                                    
+        D->table[i].status = EMPTY;
         D->table[i].link = i + 1;
     }
+    D->table[i].status = EMPTY;
+    D->table[i].link = -1;
 }
 
 void insert(Dictionary* D, int data){
     int idx = hash(data);
 
     int* trav; 
-    for(trav = &idx; D->table[*trav].link != -1; trav = &(D->table[*trav].link));
+    for(trav = &idx; D->table[*trav].link != -1 && D->table[*trav].data != data; trav = &(D->table[*trav].link));
 
-    if(D->table[*trav].status == EMPTY){
-        D->table[*trav].data = data;
-        D->table[*trav].status = FULL;
-    } else {
-        D->table[*trav].link = D->avail;
-        D->table[D->avail].data = data;
-        D->table[D->avail].status = FULL;
-        D->table[D->avail].link = -1;
-        D->avail = D->table[D->avail].link;
+    if(D->table[*trav].data != data){
+        if(D->table[*trav].status == EMPTY){
+            D->table[*trav].data = data;
+            D->table[*trav].status = FULL;
+        } else {
+            int temp = D->avail;
+            D->table[*trav].link = D->avail;
+            D->avail = D->table[temp].link;
+            D->table[temp].link = -1;
+            D->table[temp].data = data;
+            D->table[temp].status = FULL;
+        }
     }
 }
 
@@ -137,19 +146,66 @@ void delete(Dictionary* D, int data){
     int idx = hash(data);
 
     int* trav; 
-    for(trav = &idx; D->table[*trav].link != -1; trav = &(D->table[*trav].link));
+    for(trav = &idx; D->table[*trav].link != -1 && D->table[*trav].data != data; trav = &(D->table[*trav].link));
 
-    
+    if(D->table[*trav].data == data){
+        int temp;
+        if(*trav != idx){
+            temp = *trav;
+            *trav = D->table[temp].link;
+            D->table[temp].status = EMPTY;
+            D->table[temp].link = D->avail;
+            D->avail = temp;
+        } else {
+            temp = D->table[*trav].link;
+            D->table[*trav].data = D->table[temp].data;
+            D->table[*trav].link = D->table[temp].link;
+            D->table[temp].link = D->avail;
+            D->table[temp].status = EMPTY;
+            D->avail = temp;
+        } 
+    }
 }
 
 bool member(Dictionary* D, int data){
+    int idx = hash(data);
 
+    int trav;
+    for(trav = idx; D->table[trav].link != -1 && D->table[trav].data != data; trav = D->table[trav].link);
+    return (D->table[trav].data == data && D->table[trav].status == FULL) ? true : false;
 }
 
 void print(Dictionary* D){
-
+    printf("Hash:\n");
+    for(int i = 0; i < MAX; i++){
+        printf("[%d]: ", i);
+        for(int j = i; j != -1; j = D->table[j].link){
+            if(D->table[j].status == FULL){
+                printf("%d ", D->table[j].data);
+            } else {
+                printf("<empty> ");
+            }
+        }
+        printf("\n");
+    }
 }
 
 void populateDict(Dictionary* D){
+    int size;
+    while(true){
+        printf("Enter Number of elements (max 20): ");
+        if(scanf(" %d", &size) == -1 || size < 0 || size > MAX*2){
+            printf("Invalid input. try again.\n");
+        } else {
+            break;
+        }
+    }
 
+    int data;
+    for(int i = 0; i < size; i++){
+        printf("Enter element [%d]: ", i);
+        if(scanf(" %d", &data) != -1 && data > -1){
+            insert(D, data);
+        }
+    }
 }
