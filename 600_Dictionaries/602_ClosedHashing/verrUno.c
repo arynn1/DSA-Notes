@@ -2,13 +2,16 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #define MAX 10
-#define EMPTY -1
-#define FULL 1
-#define DELETED 0
+
+typedef enum{
+    FULL,
+    EMPTY,
+    DELETED
+}Status;
 
 typedef struct{
     int data;
-    int status;
+    Status status;
 }nodeType;
 
 typedef nodeType Dictionary[MAX];

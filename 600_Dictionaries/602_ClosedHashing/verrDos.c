@@ -6,7 +6,6 @@
 typedef enum{
     FULL,
     EMPTY,
-    DELETED
 }Status;
 
 typedef struct{
@@ -14,12 +13,15 @@ typedef struct{
     Status status;
 }nodeType;
 
-typedef nodeType Dictionary[MAX*2];
+typedef struct{
+    nodeType table[MAX*2];
+    int avail;
+}Dictionary;
 
 int hash(int data);
 void initDict(Dictionary* D);
 void insert(Dictionary* D, int data);
-void delete(Dictionary* D, int data);S s
+void delete(Dictionary* D, int data);
 bool member(Dictionary* D, int data);
 void print(Dictionary* D);
 void populateDict(Dictionary* D);
@@ -103,18 +105,50 @@ int hash(int data){
 
 void initDict(Dictionary* D){
     for(int i = 0; i < MAX*2; i++){
-        (*D)[i].status = EMPTY;
+        D->table[i].status = EMPTY;
     }
+    D->avail = MAX;
 }
 
 void insert(Dictionary* D, int data){
     int idx = hash(data);
-    
+    if(D->table[idx].status == FULL){
+        if(D->table[idx].data != data){
+            int i;
+            for(i = D->avail; i < MAX*2 && D->table[i].data != data; i++);  
+            if(i < MAX*2){
+                for(int j = D->avail; j < MAX*2; j++){
+                    if(D->table[j].status == EMPTY){
+                        D->table[j].data = data;
+                        D->table[j].status = FULL;
+                        break;
+                    } else {
+                        printf("Dictionary is Full.\n");
+                    }
+                }
+            }
+        } else {
+            printf("Element %d is in the Dictionary.\n", data);
+        }
+    } else {
+        D->table[idx].data = data;
+        D->table[idx].status = FULL;
+    }
 }
 
 void delete(Dictionary* D, int data){
     int idx = hash(data);
-    
+    if(D->table[idx].status == FULL && D->table[idx].data == data){
+        int i;
+        for(i = D->avail; i < MAX*2 && D->table[i].data != data; i++);  
+        if(i < MAX*2){
+            D->table[i].status = EMPTY;
+        } else {
+            printf("Element %d is not in the Dictionary.\n", data);
+        }
+    } else {
+        D->table[idx].status = EMPTY;
+    }
 }
 
 bool member(Dictionary* D, int data){

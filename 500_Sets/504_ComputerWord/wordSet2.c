@@ -3,8 +3,9 @@
 #include <stdbool.h>
 #include <string.h>
 
-#define MAX_ELEM 15
 #define MAX_SIZE 16
+#define MAX_ELEM (MAX_SIZE - 1)
+
 
 typedef unsigned short SET;
 
@@ -21,6 +22,9 @@ SET Difference(SET A, SET B);
 int main(){
     SET setA, setB, setC;
     
+    SET setD = 70;
+    printSet(setD);
+
     printf("--- Computer Word Set Driver ---\n");
     
     initSet(&setA);
@@ -88,17 +92,17 @@ void initSet(SET* S){
 }
 
 void insertToSet(SET *S, int data){
-    unsigned short mask = 1 << data;
+    unsigned int mask = 1 << data;
     *S = (*S) | mask;
 }
 
 void deleteFromSet(SET *S, int data){
-    unsigned short mask = 1 << data;
+    unsigned int mask = 1 << data;
     *S = (*S) & (~mask);
 }
 
 bool member(SET S, int data){
-    unsigned short mask = 1 << data;
+    unsigned int mask = 1 << data;
     return (S & mask) > 0;
 }
 
