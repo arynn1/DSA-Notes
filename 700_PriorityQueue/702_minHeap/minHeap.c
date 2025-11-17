@@ -7,18 +7,19 @@ typedef struct{
     int lastIdx;
 }minheap;
 
-void initMinHeap(minheap* mh);
+void makeNull(minheap* mh);
 void insert(minheap* mh, int data);
 void deleteMin(minheap* mh);
 void getMin(minheap *mh);
-void heapify(minheap* mh);
+void heapifyDown(minheap* mh, int root);
+void heapifyUp(minheap* mh, int child);
 void heapsort(minheap *mh);
 
 int main(){
     return 0;
 }
 
-void initMinHeap(minheap* mh){
+void makeNull(minheap* mh){
     mh->lastIdx = -1;
 }
 
@@ -51,7 +52,7 @@ void deleteMin(minheap* mh){
             RC = (2 * i) + 2;
             j = LC;
 
-            if(mh->heap[RC] <= mh->lastIdx && mh->heap[RC] < mh->heap[j]){
+            if(RC <= mh->lastIdx && mh->heap[RC] < mh->heap[j]){
                 j = RC;
             }
 
@@ -73,8 +74,24 @@ void getMin(minheap *mh){
     }
 }
 
-void heapify(minheap* mh){
+void heapifyDown(minheap* mh, int root){
+    int LC = (root * 2) + 1;
+    int RC = (root * 2) + 2;
+    int swap = root;
+
+    if(LC <= mh->lastIdx && mh->heap[LC] < mh->heap[swap]) swap = LC;
+    if(RC <= mh->lastIdx && mh->heap[RC] < mh->heap[swap]) swap = RC;
     
+    if(swap != root){
+        int temp = mh->heap[root];
+        mh->heap[root] = mh->heap[swap];
+        mh->heap[swap] = temp;
+        heapify(mh, swap);
+    }
+}
+
+void heapifyUp(minheap* mh, int child){
+
 }
 
 void heapsort(minheap *mh){
