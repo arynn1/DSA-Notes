@@ -9,8 +9,8 @@ typedef struct{
 
 void makeNull(minheap* mh);
 void insert(minheap* mh, int data);
-void deleteMin(minheap* mh);
-void getMin(minheap *mh);
+int deleteMin(minheap* mh);
+int getMin(minheap *mh);
 void heapifyDown(minheap* mh, int root);
 void heapifyUp(minheap* mh, int child);
 void heapsort(minheap *mh);
@@ -37,40 +37,34 @@ void insert(minheap* mh, int data){
         }
 
         mh->heap[i] = data;
+    } else {
+        printf("queue is full.");
     }
 }
 
-void deleteMin(minheap* mh){
+int deleteMin(minheap* mh){
     int min, i, j, LC, RC, temp;
-    if(mh->lastIdx == -1){
+    if(mh->lastIdx != -1){
         min = mh->heap[0];
         mh->heap[0] = mh->heap[mh->lastIdx--];
 
-        i = 0;
-        while((2 * i) + 1 <= mh->lastIdx){
-            LC = (2 * i) + 1;
-            RC = (2 * i) + 2;
-            j = LC;
-
-            if(RC <= mh->lastIdx && mh->heap[RC] < mh->heap[j]){
-                j = RC;
-            }
-
-            if(mh->heap[i] > mh->heap[j]){
-                temp = mh->heap[i];
-                mh->heap[i] = mh->heap[j];
-                mh->heap[j] = temp;
-            } else {
-                break;
-            }
-        }
+        if(mh->lastIdx >= 0){
+            i = 0;
+            heapifyDown(mh, i);
+        } 
         return min;
+    } else {
+        printf("queue is empty.");
+        return -1;
     }
 }
 
-void getMin(minheap *mh){
+int getMin(minheap *mh){
     if(mh->lastIdx != -1){
         return mh->heap[0];
+    } else {
+        printf("queue is empty.");
+        return -1;
     }
 }
 
@@ -91,7 +85,7 @@ void heapifyDown(minheap* mh, int root){
 }
 
 void heapifyUp(minheap* mh, int child){
-
+ 
 }
 
 void heapsort(minheap *mh){
