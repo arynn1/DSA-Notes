@@ -12,10 +12,53 @@ void insert(minheap* mh, int data);
 int deleteMin(minheap* mh);
 int getMin(minheap *mh);
 void heapifyDown(minheap* mh, int root);
-void heapifyUp(minheap* mh, int child);
-void heapsort(minheap *mh);
+void heapsort(minheap *mh, int arr[], int size);
+void printHeap(minheap *mh);
+void printTreeRecursive(minheap *mh, int index, int level);
+void printHeapTree(minheap *mh);
 
 int main(){
+    minheap myHeap;
+    makeNull(&myHeap);
+
+    // Test 1: Manual Insertion
+    printf("--- Test 1: Manual Insertions ---\n");
+    insert(&myHeap, 15);
+    insert(&myHeap, 3);
+    insert(&myHeap, 8);
+    insert(&myHeap, 1);  
+    insert(&myHeap, 20);
+    insert(&myHeap, 9); // Added more nodes for better visualization
+    insert(&myHeap, 12);
+    
+    printf("\n[Flat Array View]: ");
+    printHeap(&myHeap); 
+
+    printf("\n[Tree View (Sideways)]:\n");
+    printf("(Rotate head left to see the pyramid)\n");
+    printHeapTree(&myHeap);
+
+    printf("\nExtracted Min: %d\n", deleteMin(&myHeap)); 
+    
+    printf("\n[Tree View after Extraction]:\n");
+    printHeapTree(&myHeap);
+
+    // Test 2: Heapsort
+    printf("\n--- Test 2: Heapsort Function ---\n");
+    // Note: Heapsort will overwrite the existing heap content
+    int unsortedData[] = {50, 10, 30, 5, 20, 80, 1};
+    int size = sizeof(unsortedData) / sizeof(unsortedData[0]);
+
+    printf("Input Array: ");
+    for(int i=0; i<size; i++) printf("%d ", unsortedData[i]);
+    printf("\n");
+
+    heapsort(&myHeap, unsortedData, size);
+
+    printf("Sorted Result: ");
+    printHeap(&myHeap); 
+    // Note: Since this uses MinHeap + Append-to-End, the order is DESCENDING.
+    
     return 0;
 }
 
@@ -30,7 +73,7 @@ void insert(minheap* mh, int data){
         i = ++mh->lastIdx;
         parent = (i-1) / 2;
         
-        while(i > 0 && mh->heap[parent] < data){
+        while(i > 0 && mh->heap[parent] > data){
             mh->heap[i] = mh->heap[parent];
             i = parent;
             parent = (i-1) / 2;
@@ -43,7 +86,7 @@ void insert(minheap* mh, int data){
 }
 
 int deleteMin(minheap* mh){
-    int min, i, j, LC, RC, temp;
+    int min, i;
     if(mh->lastIdx != -1){
         min = mh->heap[0];
         mh->heap[0] = mh->heap[mh->lastIdx--];
@@ -80,14 +123,68 @@ void heapifyDown(minheap* mh, int root){
         int temp = mh->heap[root];
         mh->heap[root] = mh->heap[swap];
         mh->heap[swap] = temp;
-        heapify(mh, swap);
+        heapifyDown(mh, swap);
     }
 }
 
-void heapifyUp(minheap* mh, int child){
- 
+void heapsort(minheap *mh, int arr[], int size){
+    if(size > MAX){
+        printf("Array too large!\n");
+        return; 
+    }
+
+    if(mh->lastIdx < MAX){
+        //Step 1: insert all elements into the heap and turn it into a valid heap
+        for(int i = 0; i < size; i++){
+        mh->heap[i] = arr[i];
+        }
+        mh->lastIdx = size - 1;
+        
+        int root = (mh->lastIdx - 1) / 2;
+        while(root >= 0){
+            heapifyDown(mh, root);
+            root--;
+        }
+        //Step 2: repeatedly delete minimum element and append to the end of the heap
+        int n = mh->lastIdx;
+        for(int i = 0; i <= n; i++){
+            int min = deleteMin(mh);
+            if(min == -1) break;
+            mh->heap[mh->lastIdx + 1] = min;
+        }
+        mh->lastIdx = n;
+    }
 }
 
-void heapsort(minheap *mh){
+void printHeap(minheap *mh){
+    printf("[ ");
+    for(int i = 0; i <= mh->lastIdx; i++){
+        printf("%d ", mh->heap[i]);
+    }
+    printf("]\n");
+}
 
+void printTreeRecursive(minheap *mh, int index, int level) {
+    if (index > mh->lastIdx) {
+        return;
+    }
+
+    printTreeRecursive(mh, (index * 2) + 2, level + 1);
+
+    printf("\n");
+    for (int i = 0; i < level; i++) {
+        printf("\t");
+    }
+    printf("%d", mh->heap[index]);
+
+    printTreeRecursive(mh, (index * 2) + 1, level + 1);
+}
+
+void printHeapTree(minheap *mh) {
+    if (mh->lastIdx == -1) {
+        printf("Empty Heap\n");
+    } else {
+        printTreeRecursive(mh, 0, 0);
+        printf("\n");
+    }
 }
