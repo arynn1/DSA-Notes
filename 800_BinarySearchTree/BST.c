@@ -24,8 +24,84 @@ BST* min(BST* T);
 void visualizeTreeHelper(const BST T, const char* prefix, bool isLeft); 
 void visualizeTree(const BST* T);
 
+int main(){
+    BST tree = NULL;
+    printf("--- BST Driver Program ---\n\n");
 
-// --- CORE BST OPERATIONS (Unchanged) ---
+    printf("1. INITIAL INSERTIONS\n");
+    printf("Inserting: 50, 30, 70, 20, 40, 60, 80, 35, 45, 75, 85\n");
+    insert(&tree, 50);
+    insert(&tree, 30);
+    insert(&tree, 70);
+    insert(&tree, 20);
+    insert(&tree, 40);
+    insert(&tree, 60);
+    insert(&tree, 80);
+    insert(&tree, 35);
+    insert(&tree, 45);
+    insert(&tree, 75);
+    insert(&tree, 85);
+    
+    printf("In-order Traversal: ");
+    printTree(tree);
+    printf("\n");
+
+    printf("\nTree Structure (R = Root):\n");
+    visualizeTree(&tree);
+    printf("----------------------------------------------------------\n\n");
+
+    printf("3. TESTING DELETION CASES\n");
+
+    // Case 1: Delete a leaf node (20)
+    printf("Case 1: Deleting a Leaf Node (20)\n");
+    delete(&tree, 20);
+    printf("Tree Structure:\n");
+    visualizeTree(&tree);
+    printf("----------------------------------------------------------\n\n");
+
+    // Case 2a: Delete node with one child (left) - (40) becomes 35
+    printf("Case 2a: Deleting Node with One right Child (30)\n");
+    delete(&tree, 30);
+    printf("Tree Structure:\n");
+    visualizeTree(&tree);
+    printf("----------------------------------------------------------\n\n");
+    
+    // Case 3a: Delete node with two children - (30). Successor is 35.
+    printf("Case 3a: Deleting Node with Two Children (70). Successor is 75.\n");
+    delete(&tree, 70);
+    printf("Tree Structure:\n");
+    visualizeTree(&tree);
+    printf("----------------------------------------------------------\n\n");
+    
+    // Case 3b: Delete Root (50). Successor is 60.
+    printf("Case 3b: Deleting Root Node with Two Children (50). Successor is 60.\n");
+    delete(&tree, 50);
+    printf("Tree Structure:\n");
+    visualizeTree(&tree);
+    printf("----------------------------------------------------------\n\n");
+
+    // Case 3b: Delete Root (50). Successor is 60.
+    printf("Case 3c: inserting 20\n");
+    insert(&tree, 20);
+    printf("Tree Structure:\n");
+    visualizeTree(&tree);
+    printf("----------------------------------------------------------\n\n");
+
+    // Case 3b: Delete Root (50). Successor is 60.
+    printf("Case 3d: Delete 35\n");
+    delete(&tree, 35);
+    printf("Tree Structure:\n");
+    visualizeTree(&tree);
+    printf("----------------------------------------------------------\n\n");
+
+    printf("4. TESTING MAKE NULL\n");
+    makeNull(&tree);
+    printf("Tree after makeNull:\n");
+    visualizeTree(&tree);
+    printf("\n");
+
+    return 0; 
+}
 
 void printTree(const BST T) {
     if (T != NULL) {
@@ -167,84 +243,3 @@ void visualizeTree(const BST* T) {
     visualizeTreeHelper(*T, "", false); 
 }
 
-
-// --- DRIVER PROGRAM (Updated) ---
-
-int main(){
-    BST tree = NULL;
-    printf("--- BST Driver Program ---\n\n");
-
-    printf("1. INITIAL INSERTIONS\n");
-    printf("Inserting: 50, 30, 70, 20, 40, 60, 80, 35, 45, 75, 85\n");
-    insert(&tree, 50);
-    insert(&tree, 30);
-    insert(&tree, 70);
-    insert(&tree, 20);
-    insert(&tree, 40);
-    insert(&tree, 60);
-    insert(&tree, 80);
-    insert(&tree, 35);
-    insert(&tree, 45);
-    insert(&tree, 75);
-    insert(&tree, 85);
-    
-    printf("In-order Traversal: ");
-    printTree(tree);
-    printf("\n");
-
-    printf("\nTree Structure (R = Root):\n");
-    visualizeTree(&tree);
-    printf("----------------------------------------------------------\n\n");
-
-    printf("3. TESTING DELETION CASES\n");
-
-    // Case 1: Delete a leaf node (20)
-    printf("Case 1: Deleting a Leaf Node (20)\n");
-    delete(&tree, 20);
-    printf("Tree Structure:\n");
-    visualizeTree(&tree);
-    printf("----------------------------------------------------------\n\n");
-
-    // Case 2a: Delete node with one child (left) - (40) becomes 35
-    printf("Case 2a: Deleting Node with One right Child (30)\n");
-    delete(&tree, 30);
-    printf("Tree Structure:\n");
-    visualizeTree(&tree);
-    printf("----------------------------------------------------------\n\n");
-    
-    // Case 3a: Delete node with two children - (30). Successor is 35.
-    printf("Case 3a: Deleting Node with Two Children (70). Successor is 75.\n");
-    delete(&tree, 70);
-    printf("Tree Structure:\n");
-    visualizeTree(&tree);
-    printf("----------------------------------------------------------\n\n");
-    
-    // Case 3b: Delete Root (50). Successor is 60.
-    printf("Case 3b: Deleting Root Node with Two Children (50). Successor is 60.\n");
-    delete(&tree, 50);
-    printf("Tree Structure:\n");
-    visualizeTree(&tree);
-    printf("----------------------------------------------------------\n\n");
-
-    // Case 3b: Delete Root (50). Successor is 60.
-    printf("Case 3c: inserting 20\n");
-    insert(&tree, 20);
-    printf("Tree Structure:\n");
-    visualizeTree(&tree);
-    printf("----------------------------------------------------------\n\n");
-
-    // Case 3b: Delete Root (50). Successor is 60.
-    printf("Case 3d: Delete 35\n");
-    delete(&tree, 35);
-    printf("Tree Structure:\n");
-    visualizeTree(&tree);
-    printf("----------------------------------------------------------\n\n");
-
-    printf("4. TESTING MAKE NULL\n");
-    makeNull(&tree);
-    printf("Tree after makeNull:\n");
-    visualizeTree(&tree);
-    printf("\n");
-
-    return 0;
-}
