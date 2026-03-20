@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <limits.h>
+#include <stdbool.h>
 
 typedef struct Node{
     int data;
@@ -15,6 +16,9 @@ typedef struct{
 void bubbleSort(Array*);
 void selectionSort(Array*);
 void insertionSort(Array*);
+void combSort(Array*);
+int* countingSort(Array*);
+void shellSort(Array*);
 void printArray(Array);
 
 int main(){    
@@ -34,7 +38,7 @@ int main(){
     }
 
     int choice;
-    printf("--------Which sorting algorithm?--------\n1 - bubble sort\n2 - selection sort\n3 - insertion sort\n----------------------------------------\n");
+    printf("--------Which sorting algorithm?--------\n1 - bubble sort\n2 - selection sort\n3 - insertion sort\n4 - comb sort\n5 - counting sort\n6 - shell sort\n----------------------------------------\n");
     printf("Enter your choice: ");
     scanf("%d", &choice);
     switch(choice){
@@ -46,6 +50,16 @@ int main(){
             break;
         case 3:
             insertionSort(&arr);
+            break;
+        case 4: 
+            combSort(&arr);
+            break;
+        case 5:
+            arr.elems = countingSort(&arr);
+            break;
+        case 6: 
+            shellSort(&arr);
+            break;
         default:
             printf("Invalid choice\n");
     }
@@ -94,6 +108,82 @@ void insertionSort(Array* arr){
         arr->elems[j] = temp;
     }
 }
+
+void combSort(Array* arr){
+    int temp, gap;
+    bool swapped = true; 
+
+    gap = arr->size;
+
+    while(gap > 1 || swapped){
+
+        gap = gap / 1.3;
+        if(gap < 1) gap = 1;
+
+        swapped = false;
+
+        for(int j = 0; j < arr->size && gap + j < arr->size; j++){
+            if(arr->elems[j] > arr->elems[j+gap]){
+                temp = arr->elems[j];
+                arr->elems[j] = arr->elems[j+gap];
+                arr->elems[j+gap] = temp;
+
+                swapped = true;
+            }
+        }
+    }
+}
+
+int* countingSort(Array* arr){
+    int max, curr;
+
+    int* result = malloc(arr->size * sizeof(int));
+
+    max = arr->elems[0];
+    curr = 1;
+    while(curr < arr->size){
+        if(arr->elems[curr] > max){
+            max = arr->elems[curr];
+        }
+        curr++;
+    }
+
+    int countingLength = max + 1;
+    int* countingArr = calloc(countingLength, sizeof(int));
+
+    for(int i = 0; i < arr->size; i++){
+        countingArr[arr->elems[i]]++;
+    }
+
+    int count = 0;
+    for(int i = 0; i < countingLength; i++){
+        countingArr[i] += count;
+        count = countingArr[i];
+    }
+
+    for(int i = arr->size - 1; i >= 0; i--){
+        countingArr[arr->elems[i]]--;
+        result[countingArr[arr->elems[i]]] = arr->elems[i];
+    }
+
+    free(countingArr);
+    return result;
+}
+
+void shellSort(Array* arr){
+    int temp, gap, i, j;
+    for(gap = arr->size / 2; gap > 0; gap = gap / 2){
+        for(i = gap; i < arr->size; i++){
+            temp = arr->elems[i];
+            for(j = i; j >= gap && arr->elems[j - gap] > temp; j = j - gap){
+                arr->elems[j] = arr->elems[j - gap];
+            }
+            arr->elems[j] = temp;
+        }
+    }
+}
+
+
 
 void printArray(Array arr){
     printf("[ ");
