@@ -2,11 +2,14 @@
 #include <stdlib.h>
 #include <limits.h>
 #include <stdbool.h>
+#define bucketSize 10
 
 typedef struct Node{
     int data;
     struct Node* link;
 } nodetype, *nodeptr;
+
+typedef nodeptr Dictionary[bucketSize];
 
 typedef struct{
     int size;
@@ -19,7 +22,12 @@ void insertionSort(Array*);
 void combSort(Array*);
 int* countingSort(Array*);
 void shellSort(Array*);
+void gnomeSort(Array*);
 void printArray(Array);
+void bucketSort(Array*);
+void insertSorted(int, nodeptr*);
+int bucketAssign(int, int);
+int getMax(Array);
 
 int main(){    
     Array arr;
@@ -38,7 +46,7 @@ int main(){
     }
 
     int choice;
-    printf("--------Which sorting algorithm?--------\n1 - bubble sort\n2 - selection sort\n3 - insertion sort\n4 - comb sort\n5 - counting sort\n6 - shell sort\n----------------------------------------\n");
+    printf("--------Which sorting algorithm?--------\n1 - bubble sort\n2 - selection sort\n3 - insertion sort\n4 - comb sort\n5 - counting sort\n6 - shell sort\n7 - gnome sort\n8 - bucket sort\n----------------------------------------\n");
     printf("Enter your choice: ");
     scanf("%d", &choice);
     switch(choice){
@@ -59,6 +67,12 @@ int main(){
             break;
         case 6: 
             shellSort(&arr);
+            break;
+        case 7: 
+            gnomeSort(&arr);
+            break;
+        case 8: 
+            bucketSort(&arr);
             break;
         default:
             printf("Invalid choice\n");
@@ -183,7 +197,72 @@ void shellSort(Array* arr){
     }
 }
 
+void gnomeSort(Array* arr){
+    int temp, pos = 0;
+    while(pos < arr->size){
+        if(pos == 0 || arr->elems[pos] > arr->elems[pos - 1]){
+            pos++;
+        } else {
+            temp = arr->elems[pos];
+            arr->elems[pos] = arr->elems[pos - 1];
+            arr->elems[pos - 1] = temp;
+            pos--;
+        }
+    }
+}
 
+void bucketSort(Array* arr){
+    Dictionary buckets;
+
+    for(int i = 0; i < bucketSize; i++) buckets[i] = NULL;
+
+    int max = getMax(*arr);
+    if(max == 0) return;
+
+    for(int i = 0; i < arr->size; i++){
+        insertSorted(arr->elems[i], &(buckets[bucketAssign(arr->elems[i], max)]));
+    }
+
+    int currIdx = 0;
+    for(int i = 0; i < 10; i++){
+        nodeptr temp;
+        while(buckets[i] != NULL){
+            arr->elems[currIdx++] = buckets[i]->data;
+            
+            temp = buckets[i];
+            buckets[i] = buckets[i]->link;
+            free(temp); 
+        }
+    }
+}
+
+void insertSorted(int num, nodeptr* head){
+    nodeptr* trav;
+    for(trav = head; (*trav) != NULL && (*trav)->data <= num; trav = &(*trav)->link);
+    
+    nodeptr newNode = malloc(sizeof(struct Node));
+    if (newNode == NULL) {
+        printf("Memory allocation failed.\n");
+        return;
+    }
+
+    newNode->data = num;
+    newNode->link = *trav;
+    *trav = newNode;
+}
+
+int bucketAssign(int num, int max){
+    int index = (num * (bucketSize - 1)) / max;
+    return index;
+}
+
+int getMax(Array arr){
+    int max = arr.elems[0];
+    for(int i = 1; i < arr.size; i++){
+        if(arr.elems[i] > max) max = arr.elems[i];
+    }
+    return max;
+}
 
 void printArray(Array arr){
     printf("[ ");
@@ -193,3 +272,8 @@ void printArray(Array arr){
     printf("]");
 }
 
+// quick sort
+// merge sort
+// strand sort
+// radix 
+// tournament sort
